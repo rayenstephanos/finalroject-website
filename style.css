@@ -1,0 +1,568 @@
+/* ════════════════════════════════════════════════════════════
+   style.css — Shared stylesheet · CSC331 Project
+   Michael Karaki & Rayen Estephanos
+   Theme: Dark editorial · Syne + Instrument Sans
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 1. DESIGN TOKENS ────────────────────────────────────── */
+:root {
+  /* Core palette */
+  --c-bg:       #0c0e12;
+  --c-surface:  #111318;
+  --c-surface2: #181b22;
+  --c-border:   rgba(255,255,255,0.07);
+  --c-border2:  rgba(255,255,255,0.12);
+
+  /* Text */
+  --c-white:    #f0f0f2;
+  --c-muted:    #8a8f9e;
+  --c-subtle:   #4a4f5e;
+
+  /* Accent — electric mint */
+  --c-mint:     #00ffa3;
+  --c-mint-dim: rgba(0,255,163,0.12);
+
+  /* Secondary accent — indigo */
+  --c-indigo:   #6366f1;
+
+  /* Feedback */
+  --c-danger:   #f87171;
+  --c-success:  #4ade80;
+  --c-warning:  #fbbf24;
+
+  /* Layout */
+  --header-h:   72px;
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+}
+
+/* ── 2. RESET ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--c-bg);
+  color: var(--c-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a   { color: inherit; text-decoration: none; }
+ul  { list-style: none; }
+
+/* ── 3. KEYFRAMES (shared) ────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── 4. HEADER ────────────────────────────────────────────── */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 7vw;
+  background: rgba(12,14,18,0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--c-border);
+}
+
+/* Logo */
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--c-white);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* ── 5. DESKTOP NAV ───────────────────────────────────────── */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.nav-link {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--c-muted);
+  padding: 0.45rem 0.9rem;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--c-white);
+  background: rgba(255,255,255,0.06);
+}
+
+.nav-link.active {
+  color: var(--c-white);
+  background: rgba(255,255,255,0.08);
+}
+
+/* Contact CTA pill */
+.nav-cta {
+  background: var(--c-mint);
+  color: #03160d !important;
+  font-weight: 500;
+  margin-left: 0.6rem;
+  padding: 0.48rem 1.1rem;
+}
+
+.nav-cta:hover {
+  background: #33ffb3 !important;
+  color: #03160d !important;
+}
+
+/* Hamburger — hidden on desktop */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  cursor: pointer;
+  width: 40px; height: 38px;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 18px; height: 1.5px;
+  background: var(--c-white);
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* ── 6. DRAWER (mobile side menu) ─────────────────────────── */
+.drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+}
+
+.drawer-overlay.visible { display: block; }
+
+.drawer {
+  position: fixed;
+  top: 0; right: -320px;
+  width: 300px;
+  height: 100%;
+  background: var(--c-surface);
+  border-left: 1px solid var(--c-border2);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawer.open { right: 0; }
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.8rem;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.drawer-close {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  width: 34px; height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--c-muted);
+  font-size: 0.85rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.drawer-close:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--c-white);
+}
+
+.drawer-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 1rem;
+  gap: 2px;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--c-muted);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.drawer-link:hover,
+.drawer-link.active {
+  background: rgba(255,255,255,0.05);
+  color: var(--c-white);
+}
+
+.drawer-link.active { color: var(--c-mint); }
+
+.d-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--c-subtle);
+  letter-spacing: 0.05em;
+  min-width: 22px;
+}
+
+.drawer-footer {
+  padding: 1.5rem 1.8rem;
+  border-top: 1px solid var(--c-border);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.75rem;
+  color: var(--c-subtle);
+  letter-spacing: 0.08em;
+}
+
+/* ── 7. BUTTONS ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.75rem 1.6rem;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.25s, transform 0.2s, opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btn--mint {
+  background: var(--c-mint);
+  color: #03160d;
+}
+
+.btn--mint:hover {
+  background: #33ffb3;
+  transform: translateY(-2px);
+}
+
+.btn--ghost {
+  background: rgba(255,255,255,0.06);
+  color: var(--c-white);
+  border: 1px solid var(--c-border2);
+}
+
+.btn--ghost:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--c-mint);
+  border: 1px solid rgba(0,255,163,0.35);
+}
+
+.btn--outline:hover {
+  background: var(--c-mint-dim);
+  transform: translateY(-2px);
+}
+
+/* ── 8. PAGE HERO (inner pages) ───────────────────────────── */
+main {
+  flex: 1;
+  padding-top: var(--header-h);
+}
+
+.page-hero {
+  padding: 6rem 7vw 4rem;
+  border-bottom: 1px solid var(--c-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(0,255,163,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.page-eyebrow {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-mint);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-eyebrow::before {
+  content: '';
+  display: block;
+  width: 20px; height: 1px;
+  background: var(--c-mint);
+}
+
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--c-white);
+  margin-bottom: 1.2rem;
+}
+
+.page-sub {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--c-muted);
+  max-width: 560px;
+  line-height: 1.8;
+}
+
+/* ── 9. CARDS / SURFACES ──────────────────────────────────── */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+
+/* ── 10. TABLES ───────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+thead { background: var(--c-surface2); }
+
+thead th {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  border-bottom: 1px solid var(--c-border);
+}
+
+tbody td {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--c-border);
+  color: var(--c-white);
+  font-family: 'Instrument Sans', sans-serif;
+  font-weight: 300;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+/* ── 11. FORMS ────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.form-label {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--c-muted);
+  letter-spacing: 0.04em;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--c-white);
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1.1rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--c-subtle); }
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: rgba(0,255,163,0.5);
+  box-shadow: 0 0 0 3px rgba(0,255,163,0.08);
+}
+
+.form-textarea { resize: vertical; min-height: 130px; }
+
+.error-msg {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--c-danger);
+  display: none;
+}
+
+.error-msg.visible { display: block; }
+
+/* ── 12. FOOTER ───────────────────────────────────────────── */
+.site-footer {
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
+  padding: 2.5rem 7vw;
+  margin-top: auto;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+
+.footer-brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--c-white);
+}
+
+.footer-copy {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--c-subtle);
+  text-align: center;
+  flex: 1;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.82rem;
+  color: var(--c-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--c-mint); }
+
+/* ── 13. SECTION UTILITIES ────────────────────────────────── */
+.content-section { padding: 5rem 7vw; }
+.content-section + .content-section { border-top: 1px solid var(--c-border); }
+
+/* ── 14. RESPONSIVE ───────────────────────────────────────── */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .site-header { padding: 0 5vw; }
+  .site-footer  { padding: 2rem 5vw; }
+  .content-section { padding: 4rem 5vw; }
+  .page-hero { padding: 5rem 5vw 3.5rem; }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-links { justify-content: center; }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  :root { --header-h: 64px; }
+
+  .site-header { padding: 0 5vw; }
+  .site-footer  { padding: 1.8rem 5vw; }
+  .content-section { padding: 3rem 5vw; }
+  .page-hero { padding: 4rem 5vw 3rem; }
+
+  /* Show hamburger, hide desktop nav */
+  .nav-toggle { display: flex; }
+  .site-nav   { display: none; }
+
+  .footer-inner { flex-direction: column; align-items: center; text-align: center; }
+  .footer-links { justify-content: center; }
+
+  .btn { font-size: 0.85rem; padding: 0.7rem 1.3rem; }
+}

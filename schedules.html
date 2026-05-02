@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Schedule — M&R</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    main { padding-top: var(--header-h); }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding: 5rem 7vw 4rem;
+      border-bottom: 1px solid var(--c-border);
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content:''; position:absolute; top:-150px; right:-100px;
+      width:600px; height:600px;
+      background:radial-gradient(circle,rgba(0,255,163,.08) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .eyebrow {
+      font-family:'Instrument Sans',sans-serif;
+      font-size:.72rem;font-weight:500;letter-spacing:.2em;
+      text-transform:uppercase;color:var(--c-mint);
+      margin-bottom:1rem;display:flex;align-items:center;gap:10px;
+    }
+    .eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--c-mint);}
+    .page-hero h1 {
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(2.4rem,5vw,4.5rem);
+      letter-spacing:-.03em;line-height:.95;color:var(--c-white);
+      margin-bottom:1.2rem;
+    }
+    .page-hero p {
+      font-family:'Instrument Sans',sans-serif;font-size:1rem;
+      font-weight:300;color:var(--c-muted);max-width:500px;line-height:1.8;
+    }
+
+    /* LIVE CLOCK */
+    .clock-bar {
+      background:var(--c-surface);
+      border-bottom:1px solid var(--c-border);
+      padding:.9rem 7vw;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:1rem;
+    }
+    .clock-display {
+      font-family:'Syne',sans-serif;font-size:1.4rem;
+      font-weight:700;color:var(--c-mint);letter-spacing:.05em;
+    }
+    .clock-date {
+      font-family:'Instrument Sans',sans-serif;
+      font-size:.82rem;color:var(--c-muted);
+    }
+    .current-badge {
+      display:inline-flex;align-items:center;gap:6px;
+      font-family:'Instrument Sans',sans-serif;font-size:.78rem;
+      color:var(--c-mint);
+      background:rgba(0,255,163,.08);
+      border:1px solid rgba(0,255,163,.2);
+      padding:.3rem .9rem;border-radius:100px;
+    }
+    .current-badge-dot {
+      width:6px;height:6px;border-radius:50%;
+      background:var(--c-mint);animation:pulse 2s infinite;
+    }
+
+    /* MEMBER TABS */
+    .schedule-wrap { padding: 3rem 7vw 6rem; }
+    .member-tabs {
+      display:flex;gap:.5rem;margin-bottom:2.5rem;
+      border-bottom:1px solid var(--c-border);
+      padding-bottom:0;
+    }
+    .mtab {
+      display:flex;align-items:center;gap:.6rem;
+      font-family:'Instrument Sans',sans-serif;
+      font-size:.9rem;font-weight:500;
+      color:var(--c-muted);
+      padding:.7rem 1.4rem;
+      border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+      cursor:pointer;
+      border:1px solid transparent;border-bottom:none;
+      transition:color .2s,background .2s,border-color .2s;
+      position:relative;bottom:-1px;
+    }
+    .mtab .avatar-sm {
+      width:26px;height:26px;border-radius:50%;
+      background:rgba(0,255,163,.12);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;
+      color:var(--c-mint);
+    }
+    .mtab:hover{color:var(--c-white);}
+    .mtab.active {
+      color:var(--c-white);
+      background:var(--c-surface);
+      border-color:var(--c-border);
+      border-bottom-color:var(--c-surface);
+    }
+
+    /* LEGEND */
+    .legend {
+      display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.8rem;
+    }
+    .legend-item {
+      display:flex;align-items:center;gap:6px;
+      font-family:'Instrument Sans',sans-serif;font-size:.75rem;
+      color:var(--c-muted);
+    }
+    .legend-dot {
+      width:10px;height:10px;border-radius:3px;
+    }
+
+    /* SCHEDULE TABLE */
+    .sched-panel { display:none; }
+    .sched-panel.active { display:block; animation:fadeUp .4s ease both; }
+
+    .sched-table-wrap {
+      overflow-x:auto;
+      border:1px solid var(--c-border);
+      border-radius:var(--radius-lg);
+    }
+    .sched-table {
+      width:100%;border-collapse:collapse;
+      min-width:700px;font-size:.88rem;
+    }
+    .sched-table thead th {
+      font-family:'Syne',sans-serif;font-size:.72rem;
+      font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--c-muted);padding:1rem 1.2rem;
+      background:var(--c-surface2);
+      border-bottom:1px solid var(--c-border);
+      text-align:center;
+    }
+    .sched-table thead th:first-child{text-align:left;}
+    .sched-table tbody td {
+      padding:.85rem 1rem;
+      border-bottom:1px solid var(--c-border);
+      text-align:center;
+      font-family:'Instrument Sans',sans-serif;
+      color:var(--c-muted);
+      vertical-align:middle;
+    }
+    .sched-table tbody tr:last-child td{border-bottom:none;}
+    .sched-table tbody td:first-child {
+      font-family:'Syne',sans-serif;font-size:.72rem;
+      font-weight:700;letter-spacing:.06em;
+      color:var(--c-subtle);text-align:left;
+      padding-left:1.2rem;white-space:nowrap;
+    }
+
+    /* Course cell */
+    .course-cell {
+      display:inline-flex;flex-direction:column;
+      align-items:center;gap:3px;
+      padding:.5rem .9rem;border-radius:var(--radius-sm);
+      cursor:pointer;transition:transform .2s,box-shadow .2s;
+      min-width:110px;
+    }
+    .course-cell:hover{transform:scale(1.05);box-shadow:0 4px 16px rgba(0,0,0,.3);}
+    .course-cell .c-name {
+      font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;
+    }
+    .course-cell .c-room {
+      font-family:'Instrument Sans',sans-serif;font-size:.68rem;opacity:.7;
+    }
+
+    /* Color classes */
+    .cs  {background:rgba(0,255,163,.12);color:#00ffa3;border:1px solid rgba(0,255,163,.2);}
+    .math{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.25);}
+    .eng {background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.2);}
+    .sci {background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.2);}
+    .free{background:rgba(255,255,255,.03);color:var(--c-subtle);border:1px dashed rgba(255,255,255,.06);}
+
+    /* TOOLTIP modal */
+    .course-modal {
+      position:fixed;inset:0;z-index:500;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.6);backdrop-filter:blur(6px);
+      opacity:0;pointer-events:none;transition:opacity .25s;
+    }
+    .course-modal.show{opacity:1;pointer-events:all;}
+    .course-modal-inner {
+      background:var(--c-surface);
+      border:1px solid var(--c-border2);
+      border-radius:var(--radius-xl);
+      padding:2.5rem;max-width:420px;width:90%;
+      animation:fadeUp .3s ease both;
+    }
+    .cm-tag {
+      font-family:'Instrument Sans',sans-serif;
+      font-size:.7rem;font-weight:500;letter-spacing:.1em;
+      text-transform:uppercase;color:var(--c-mint);margin-bottom:.8rem;
+    }
+    .cm-title {
+      font-family:'Syne',sans-serif;font-size:1.4rem;
+      font-weight:800;color:var(--c-white);margin-bottom:.4rem;
+    }
+    .cm-details {
+      font-family:'Instrument Sans',sans-serif;font-size:.88rem;
+      color:var(--c-muted);line-height:1.7;margin-bottom:1.5rem;
+    }
+    .cm-close {
+      display:inline-flex;align-items:center;gap:6px;
+      font-family:'Instrument Sans',sans-serif;font-size:.85rem;
+      font-weight:500;color:var(--c-mint);
+      background:rgba(0,255,163,.08);border:1px solid rgba(0,255,163,.2);
+      border-radius:100px;padding:.5rem 1.2rem;cursor:pointer;
+      transition:background .2s;
+    }
+    .cm-close:hover{background:rgba(0,255,163,.15);}
+
+    /* STATS ROW */
+    .sched-stats {
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:1rem;margin-top:1.8rem;
+    }
+    .sstat {
+      background:var(--c-surface);border:1px solid var(--c-border);
+      border-radius:var(--radius-md);padding:1.2rem 1.4rem;
+      text-align:center;
+    }
+    .sstat-num {
+      font-family:'Syne',sans-serif;font-size:1.8rem;
+      font-weight:800;color:var(--c-mint);
+    }
+    .sstat-label {
+      font-family:'Instrument Sans',sans-serif;font-size:.75rem;
+      color:var(--c-muted);margin-top:.2rem;
+    }
+
+    @media(max-width:600px){
+      .sched-stats{grid-template-columns:1fr 1fr;}
+      .schedule-wrap{padding:2rem 5vw 4rem;}
+      .clock-bar{padding:.9rem 5vw;}
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a href="home.html" class="logo">M<span style="color:var(--c-mint)">&</span>R</a>
+  <nav class="site-nav">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="aboutus.html" class="nav-link">About</a>
+    <a href="schedules.html" class="nav-link active">Schedule</a>
+    <a href="research.html" class="nav-link">Research</a>
+    <a href="media.html" class="nav-link">Media</a>
+    <a href="quiz1.html" class="nav-link">Quiz</a>
+    <a href="contactus.html" class="nav-link nav-cta"><i class="fa-regular fa-envelope"></i>&nbsp;Contact</a>
+  </nav>
+  <button class="nav-toggle" onclick="openMenu()"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="logo">M<span style="color:var(--c-mint)">&</span>R</span>
+    <button class="drawer-close" onclick="closeMenu()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="home.html" class="drawer-link"><span class="d-num">01</span>Home</a>
+    <a href="aboutus.html" class="drawer-link"><span class="d-num">02</span>About Us</a>
+    <a href="schedules.html" class="drawer-link active"><span class="d-num">03</span>Schedule</a>
+    <a href="research.html" class="drawer-link"><span class="d-num">04</span>Research</a>
+    <a href="media.html" class="drawer-link"><span class="d-num">05</span>Media</a>
+    <a href="quiz1.html" class="drawer-link"><span class="d-num">06</span>Quiz 1</a>
+    <a href="quiz2.php" class="drawer-link"><span class="d-num">07</span>Quiz 2</a>
+    <a href="contactus.html" class="drawer-link"><span class="d-num">08</span>Contact</a>
+  </nav>
+  <div class="drawer-footer">CSC331 · Web Programming</div>
+</aside>
+
+<main>
+  <section class="page-hero">
+    <p class="eyebrow">Academic</p>
+    <h1>Weekly<br>Schedule</h1>
+    <p>Click any course to see details. The live clock highlights the current time slot.</p>
+  </section>
+
+  <!-- LIVE CLOCK BAR -->
+  <div class="clock-bar">
+    <div>
+      <div class="clock-display" id="clockDisplay">--:--:--</div>
+      <div class="clock-date" id="clockDate"></div>
+    </div>
+    <div class="current-badge">
+      <div class="current-badge-dot"></div>
+      <span id="currentSlot">Checking schedule…</span>
+    </div>
+  </div>
+
+  <section class="schedule-wrap">
+    <!-- TABS -->
+    <div class="member-tabs">
+      <div class="mtab active" onclick="switchTab('michael',this)">
+        <div class="avatar-sm">MK</div> Michael Karaki
+      </div>
+      <div class="mtab" onclick="switchTab('rayen',this)">
+        <div class="avatar-sm">RE</div> Rayen Estephanos
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#00ffa3"></div> CS / Programming</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a5b4fc"></div> Mathematics</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> English / Humanities</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div> Science / Lab</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,.1)"></div> Free</div>
+    </div>
+
+    <!-- MICHAEL'S SCHEDULE -->
+    <div class="sched-panel active" id="panel-michael">
+      <div class="sched-table-wrap">
+        <table class="sched-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-michael"></tbody>
+        </table>
+      </div>
+      <div class="sched-stats">
+        <div class="sstat"><div class="sstat-num">5</div><div class="sstat-label">Courses</div></div>
+        <div class="sstat"><div class="sstat-num">18</div><div class="sstat-label">Credit hours</div></div>
+        <div class="sstat"><div class="sstat-num">3</div><div class="sstat-label">Labs</div></div>
+        <div class="sstat"><div class="sstat-num">2</div><div class="sstat-label">Free days</div></div>
+      </div>
+    </div>
+
+    <!-- RAYEN'S SCHEDULE -->
+    <div class="sched-panel" id="panel-rayen">
+      <div class="sched-table-wrap">
+        <table class="sched-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-rayen"></tbody>
+        </table>
+      </div>
+      <div class="sched-stats">
+        <div class="sstat"><div class="sstat-num">5</div><div class="sstat-label">Courses</div></div>
+        <div class="sstat"><div class="sstat-num">17</div><div class="sstat-label">Credit hours</div></div>
+        <div class="sstat"><div class="sstat-num">2</div><div class="sstat-label">Labs</div></div>
+        <div class="sstat"><div class="sstat-num">3</div><div class="sstat-label">Free days</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- COURSE MODAL -->
+<div class="course-modal" id="courseModal" onclick="closeModal(event)">
+  <div class="course-modal-inner">
+    <div class="cm-tag" id="cm-tag"></div>
+    <div class="cm-title" id="cm-title"></div>
+    <div class="cm-details" id="cm-details"></div>
+    <button class="cm-close" onclick="document.getElementById('courseModal').classList.remove('show')">
+      <i class="fa-solid fa-xmark"></i> Close
+    </button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">M<span style="color:var(--c-mint)">&</span>R</span>
+    <p class="footer-copy">&copy; 2026 Michael Karaki &amp; Rayen Estephanos · CSC331</p>
+    <div class="footer-links"><a href="aboutus.html">About</a><a href="contactus.html">Contact</a></div>
+  </div>
+</footer>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────
+const times = ['08:00 – 09:15','09:30 – 10:45','11:00 – 12:15','12:30 – 13:45','14:00 – 15:15','15:30 – 16:45','17:00 – 18:15'];
+
+const courses = {
+  michael: [
+    // Mon,     Tue,     Wed,     Thu,     Fri
+    [{id:'WP', name:'Web Prog',room:'NB301',type:'cs',desc:'CSC331 Web Programming. Covers HTML, CSS, JavaScript, PHP, MySQL. 3 credits.',cat:'CS / Programming'},null,{id:'WP',name:'Web Prog',room:'NB301',type:'cs',desc:'CSC331 Web Programming. Covers HTML, CSS, JavaScript, PHP, MySQL. 3 credits.',cat:'CS / Programming'},null,null],
+    [null,{id:'DS',name:'Data Struct',room:'AB210',type:'cs',desc:'CSC241 Data Structures & Algorithms. Arrays, linked lists, trees, sorting. 3 credits.',cat:'CS / Programming'},{id:'DS',name:'Data Struct',room:'AB210',type:'cs',desc:'CSC241 Data Structures. 3 credits.',cat:'CS / Programming'},null,null],
+    [{id:'CALC',name:'Calculus II',room:'MB105',type:'math',desc:'MAT202 Calculus II. Integration techniques, sequences and series. 3 credits.',cat:'Mathematics'},null,null,{id:'CALC',name:'Calculus II',room:'MB105',type:'math',desc:'MAT202 Calculus II. 3 credits.',cat:'Mathematics'},null],
+    [null,{id:'ENG',name:'Eng. Writing',room:'LB201',type:'eng',desc:'ENG211 Technical Writing for Engineers. Report writing, presentations. 3 credits.',cat:'English / Humanities'},null,{id:'ENG',name:'Eng. Writing',room:'LB201',type:'eng',desc:'ENG211 Technical Writing. 3 credits.',cat:'English / Humanities'},null],
+    [{id:'WP_LAB',name:'Web Lab',room:'Lab 2',type:'cs',desc:'CSC331L Web Programming Lab. Hands-on coding sessions. 1 credit.',cat:'Lab'},null,null,null,{id:'WP_LAB',name:'Web Lab',room:'Lab 2',type:'cs',desc:'CSC331L Web Programming Lab. 1 credit.',cat:'Lab'}],
+    [null,null,{id:'DS_LAB',name:'DS Lab',room:'Lab 1',type:'sci',desc:'CSC241L Data Structures Lab. Practical implementation sessions. 1 credit.',cat:'Lab'},null,null],
+    [null,null,null,null,null],
+  ],
+  rayen: [
+    [null,{id:'WP2',name:'Web Prog',room:'NB301',type:'cs',desc:'CSC331 Web Programming. PHP, MySQL, back-end scripting. 3 credits.',cat:'CS / Programming'},null,{id:'WP2',name:'Web Prog',room:'NB301',type:'cs',desc:'CSC331 Web Programming. 3 credits.',cat:'CS / Programming'},null],
+    [{id:'OS',name:'Oper. Systems',room:'AB315',type:'cs',desc:'CSC341 Operating Systems. Processes, memory management, file systems. 3 credits.',cat:'CS / Programming'},null,{id:'OS',name:'Oper. Systems',room:'AB315',type:'cs',desc:'CSC341 Operating Systems. 3 credits.',cat:'CS / Programming'},null,null],
+    [null,{id:'DISC',name:'Discrete Math',room:'MB201',type:'math',desc:'MAT210 Discrete Mathematics. Logic, sets, graph theory. 3 credits.',cat:'Mathematics'},null,null,{id:'DISC',name:'Discrete Math',room:'MB201',type:'math',desc:'MAT210 Discrete Math. 3 credits.',cat:'Mathematics'}],
+    [null,null,null,{id:'PHYS',name:'Physics II',room:'SB110',type:'sci',desc:'PHY202 Physics II. Electromagnetism, optics, modern physics. 3 credits.',cat:'Science'},null],
+    [{id:'WP_L2',name:'Web Lab',room:'Lab 2',type:'cs',desc:'CSC331L Web Programming Lab. 1 credit.',cat:'Lab'},null,null,{id:'WP_L2',name:'Web Lab',room:'Lab 2',type:'cs',desc:'CSC331L Web Programming Lab. 1 credit.',cat:'Lab'},null],
+    [null,{id:'PHY_L',name:'Physics Lab',room:'Lab 3',type:'sci',desc:'PHY202L Physics Laboratory. 1 credit.',cat:'Lab'},null,null,null],
+    [null,null,null,null,null],
+  ]
+};
+
+function buildTable(who){
+  const tbody = document.getElementById('tbody-'+who);
+  tbody.innerHTML='';
+  courses[who].forEach((row,ti)=>{
+    const tr=document.createElement('tr');
+    const tdTime=document.createElement('td');
+    tdTime.textContent=times[ti];
+    tr.appendChild(tdTime);
+    row.forEach(cell=>{
+      const td=document.createElement('td');
+      if(cell){
+        td.innerHTML=`<div class="course-cell ${cell.type}" onclick="showCourse(${JSON.stringify(cell).split('"').join("'")})">
+          <span class="c-name">${cell.name}</span>
+          <span class="c-room"><i class="fa-solid fa-location-dot" style="font-size:.6rem"></i> ${cell.room}</span>
+        </div>`;
+      } else {
+        td.innerHTML='<span class="course-cell free"><span class="c-name" style="font-size:.7rem">—</span></span>';
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+buildTable('michael');
+buildTable('rayen');
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(who, el){
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sched-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+who).classList.add('active');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function showCourse(cell){
+  document.getElementById('cm-tag').textContent=cell.cat;
+  document.getElementById('cm-title').textContent=cell.id+' — '+cell.name;
+  document.getElementById('cm-details').textContent=cell.desc;
+  document.getElementById('courseModal').classList.add('show');
+}
+function closeModal(e){
+  if(e.target===document.getElementById('courseModal'))
+    document.getElementById('courseModal').classList.remove('show');
+}
+
+// ── LIVE CLOCK ────────────────────────────────────────────────
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function updateClock(){
+  const now=new Date();
+  const h=String(now.getHours()).padStart(2,'0');
+  const m=String(now.getMinutes()).padStart(2,'0');
+  const s=String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clockDisplay').textContent=h+':'+m+':'+s;
+  document.getElementById('clockDate').textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+  // Highlight current slot
+  const mins=now.getHours()*60+now.getMinutes();
+  const slots=[[8*60,9*60+15],[9*60+30,10*60+45],[11*60,12*60+15],[12*60+30,13*60+45],[14*60,15*60+15],[15*60+30,16*60+45],[17*60,18*60+15]];
+  let found='No class right now';
+  slots.forEach((sl,i)=>{if(mins>=sl[0]&&mins<=sl[1])found='Currently: '+times[i];});
+  document.getElementById('currentSlot').textContent=found;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+function openMenu(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('visible');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('visible');document.body.style.overflow='';}
+</script>
+</body>
+</html>

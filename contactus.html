@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us — M&R</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    main{padding-top:var(--header-h);}
+
+    /* HERO */
+    .page-hero{padding:5rem 7vw 4rem;border-bottom:1px solid var(--c-border);position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;top:-150px;right:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,163,.08) 0%,transparent 65%);pointer-events:none;}
+    .eyebrow{font-family:'Instrument Sans',sans-serif;font-size:.72rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--c-mint);margin-bottom:1rem;display:flex;align-items:center;gap:10px;}
+    .eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--c-mint);}
+    .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.4rem,5vw,4.5rem);letter-spacing:-.03em;line-height:.95;color:var(--c-white);margin-bottom:1.2rem;}
+    .page-hero p{font-family:'Instrument Sans',sans-serif;font-size:1rem;font-weight:300;color:var(--c-muted);max-width:500px;line-height:1.8;}
+
+    /* LAYOUT */
+    .contact-layout{display:grid;grid-template-columns:1fr 420px;gap:4rem;padding:5rem 7vw 6rem;align-items:start;}
+
+    /* FORM CARD */
+    .form-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-xl);padding:2.5rem;}
+    .form-card h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--c-white);margin-bottom:.4rem;}
+    .form-card .sub{font-family:'Instrument Sans',sans-serif;font-size:.85rem;color:var(--c-muted);margin-bottom:2rem;}
+
+    /* FORM FIELDS */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .field{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.2rem;}
+    .field-label{font-family:'Instrument Sans',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.04em;color:var(--c-muted);display:flex;justify-content:space-between;align-items:center;}
+    .char-count{font-size:.72rem;color:var(--c-subtle);}
+    .field-wrap{position:relative;}
+    .field-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--c-subtle);font-size:.8rem;pointer-events:none;transition:color .2s;}
+    .field-wrap.textarea-wrap .field-icon{top:1rem;transform:none;}
+    .finput{width:100%;background:var(--c-surface2);border:1px solid var(--c-border2);border-radius:var(--radius-md);padding:.82rem 1rem .82rem 2.6rem;font-family:'Instrument Sans',sans-serif;font-size:.92rem;color:var(--c-white);outline:none;transition:border-color .2s,box-shadow .2s;}
+    .finput::placeholder{color:var(--c-subtle);}
+    .finput:focus{border-color:rgba(0,255,163,.45);box-shadow:0 0 0 3px rgba(0,255,163,.07);}
+    .finput:focus ~ .field-icon,.field-wrap:focus-within .field-icon{color:var(--c-mint);}
+    .finput.valid{border-color:rgba(74,222,128,.4);}
+    .finput.invalid{border-color:rgba(248,113,113,.4);}
+    textarea.finput{padding-left:2.6rem;resize:vertical;min-height:140px;line-height:1.6;}
+
+    /* Validation message */
+    .val-msg{font-family:'Instrument Sans',sans-serif;font-size:.73rem;display:flex;align-items:center;gap:5px;height:0;overflow:hidden;transition:height .2s;}
+    .val-msg.show{height:18px;}
+    .val-msg.err{color:#f87171;}
+    .val-msg.ok{color:#4ade80;}
+
+    /* SUBJECT PILLS */
+    .subject-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem;}
+    .spill{font-family:'Instrument Sans',sans-serif;font-size:.78rem;font-weight:500;color:var(--c-muted);padding:.38rem .9rem;border-radius:100px;border:1px solid var(--c-border);background:transparent;cursor:pointer;transition:all .2s;}
+    .spill:hover{border-color:rgba(0,255,163,.3);color:var(--c-white);}
+    .spill.active{background:rgba(0,255,163,.1);border-color:rgba(0,255,163,.35);color:var(--c-mint);}
+
+    /* SUBMIT */
+    .submit-btn{width:100%;padding:.9rem;font-size:1rem;border-radius:var(--radius-md);position:relative;overflow:hidden;}
+    .submit-btn .btn-inner{display:flex;align-items:center;justify-content:center;gap:.6rem;transition:opacity .3s,transform .3s;}
+    .submit-btn.loading .btn-inner{opacity:0;transform:translateY(10px);}
+    .submit-spinner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;}
+    .submit-btn.loading .submit-spinner{opacity:1;}
+    .spinner-ring{width:22px;height:22px;border:2px solid rgba(3,22,13,.3);border-top-color:#03160d;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* SIDEBAR INFO */
+    .contact-info{display:flex;flex-direction:column;gap:1.2rem;}
+    .info-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1.5rem;}
+    .info-card-head{display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;}
+    .info-icon{width:38px;height:38px;border-radius:var(--radius-sm);background:rgba(0,255,163,.08);border:1px solid rgba(0,255,163,.18);display:flex;align-items:center;justify-content:center;color:var(--c-mint);font-size:.85rem;flex-shrink:0;}
+    .info-card-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--c-white);}
+    .info-card-body{font-family:'Instrument Sans',sans-serif;font-size:.85rem;color:var(--c-muted);line-height:1.7;}
+    .info-card-body a{color:var(--c-mint);text-decoration:none;}
+    .info-card-body a:hover{text-decoration:underline;}
+
+    /* Team pills */
+    .team-pill{display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;border-radius:var(--radius-md);border:1px solid var(--c-border);margin-bottom:.6rem;cursor:default;}
+    .tp-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,rgba(0,255,163,.18),rgba(99,102,241,.18));border:1px solid rgba(0,255,163,.2);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--c-mint);flex-shrink:0;}
+    .tp-info{}
+    .tp-name{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--c-white);}
+    .tp-email{font-family:'Instrument Sans',sans-serif;font-size:.72rem;color:var(--c-muted);}
+
+    /* SUCCESS state */
+    .success-overlay{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem;animation:fadeUp .4s ease both;}
+    .success-overlay.show{display:flex;}
+    .success-icon{width:70px;height:70px;border-radius:50%;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#4ade80;margin:0 auto 1.5rem;}
+    .success-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--c-white);margin-bottom:.5rem;}
+    .success-sub{font-family:'Instrument Sans',sans-serif;font-size:.88rem;color:var(--c-muted);margin-bottom:2rem;}
+
+    @media(max-width:960px){.contact-layout{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}}
+    @media(max-width:600px){.contact-layout{padding:3rem 5vw 4rem;}.page-hero{padding:4rem 5vw 3rem;}}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a href="home.html" class="logo">M<span style="color:var(--c-mint)">&</span>R</a>
+  <nav class="site-nav">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="aboutus.html" class="nav-link">About</a>
+    <a href="schedules.html" class="nav-link">Schedule</a>
+    <a href="research.html" class="nav-link">Research</a>
+    <a href="media.html" class="nav-link">Media</a>
+    <a href="quiz1.html" class="nav-link">Quiz</a>
+    <a href="contactus.html" class="nav-link nav-cta active"><i class="fa-regular fa-envelope"></i>&nbsp;Contact</a>
+  </nav>
+  <button class="nav-toggle" onclick="openMenu()"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="logo">M<span style="color:var(--c-mint)">&</span>R</span>
+    <button class="drawer-close" onclick="closeMenu()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="home.html" class="drawer-link"><span class="d-num">01</span>Home</a>
+    <a href="aboutus.html" class="drawer-link"><span class="d-num">02</span>About Us</a>
+    <a href="schedules.html" class="drawer-link"><span class="d-num">03</span>Schedule</a>
+    <a href="research.html" class="drawer-link"><span class="d-num">04</span>Research</a>
+    <a href="media.html" class="drawer-link"><span class="d-num">05</span>Media</a>
+    <a href="quiz1.html" class="drawer-link"><span class="d-num">06</span>Quiz 1</a>
+    <a href="quiz2.php" class="drawer-link"><span class="d-num">07</span>Quiz 2</a>
+    <a href="contactus.html" class="drawer-link active"><span class="d-num">08</span>Contact</a>
+  </nav>
+  <div class="drawer-footer">CSC331 · Web Programming</div>
+</aside>
+
+<main>
+  <section class="page-hero">
+    <p class="eyebrow">Get in touch</p>
+    <h1>Contact<br>Us</h1>
+    <p>Have a question about our project, want to collaborate, or just say hi? Fill out the form and we'll get back to you.</p>
+  </section>
+
+  <div class="contact-layout">
+    <!-- FORM -->
+    <div class="form-card">
+      <h2>Send a message</h2>
+      <p class="sub">All fields marked with * are required. Form submits to contactusaction.php.</p>
+
+      <div id="formBody">
+        <!-- Subject pills -->
+        <div class="field">
+          <div class="field-label">Subject *</div>
+          <div class="subject-pills">
+            <div class="spill" onclick="selectSubject(this,'General Question')">General Question</div>
+            <div class="spill" onclick="selectSubject(this,'Project Feedback')">Project Feedback</div>
+            <div class="spill" onclick="selectSubject(this,'Collaboration')">Collaboration</div>
+            <div class="spill" onclick="selectSubject(this,'Bug Report')">Bug Report</div>
+            <div class="spill" onclick="selectSubject(this,'Other')">Other</div>
+          </div>
+          <input type="hidden" id="subjectVal"/>
+          <div class="val-msg err" id="subjectErr">Please select a subject.</div>
+        </div>
+
+        <form id="contactForm" action="contactusaction.php" method="POST" novalidate onsubmit="return submitForm(event)">
+          <input type="hidden" name="subject" id="subjectInput"/>
+
+          <div class="form-row">
+            <div class="field">
+              <div class="field-label">First name *</div>
+              <div class="field-wrap">
+                <input class="finput" type="text" name="firstname" id="firstname" placeholder="Michael" autocomplete="given-name" oninput="validateField(this,'name')"/>
+                <i class="fa-solid fa-user field-icon"></i>
+              </div>
+              <div class="val-msg err" id="firstname-err">Enter your first name.</div>
+            </div>
+            <div class="field">
+              <div class="field-label">Last name *</div>
+              <div class="field-wrap">
+                <input class="finput" type="text" name="lastname" id="lastname" placeholder="Karaki" autocomplete="family-name" oninput="validateField(this,'name')"/>
+                <i class="fa-solid fa-user field-icon"></i>
+              </div>
+              <div class="val-msg err" id="lastname-err">Enter your last name.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Email address *</div>
+            <div class="field-wrap">
+              <input class="finput" type="email" name="email" id="email" placeholder="you@example.com" autocomplete="email" oninput="validateField(this,'email')"/>
+              <i class="fa-solid fa-envelope field-icon"></i>
+            </div>
+            <div class="val-msg err" id="email-err">Enter a valid email address.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Phone <span style="color:var(--c-subtle)">(optional)</span></div>
+            <div class="field-wrap">
+              <input class="finput" type="tel" name="phone" id="phone" placeholder="+961 xx xxx xxx" autocomplete="tel" oninput="validateField(this,'phone')"/>
+              <i class="fa-solid fa-phone field-icon"></i>
+            </div>
+            <div class="val-msg err" id="phone-err">Enter a valid phone number.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">
+              Message *
+              <span class="char-count"><span id="msgCount">0</span>/500</span>
+            </div>
+            <div class="field-wrap textarea-wrap">
+              <textarea class="finput" name="message" id="message" rows="5" placeholder="Write your message here…" maxlength="500" oninput="validateField(this,'message');updateCount()"></textarea>
+              <i class="fa-solid fa-comment field-icon"></i>
+            </div>
+            <div class="val-msg err" id="message-err">Message must be at least 10 characters.</div>
+          </div>
+
+          <button type="submit" class="btn btn--mint submit-btn" id="submitBtn">
+            <div class="btn-inner"><i class="fa-solid fa-paper-plane"></i> Send Message</div>
+            <div class="submit-spinner"><div class="spinner-ring"></div></div>
+          </button>
+        </form>
+      </div>
+
+      <!-- SUCCESS STATE (shown after fake submit or real PHP redirect) -->
+      <div class="success-overlay" id="successOverlay">
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+        <div class="success-title">Message Sent!</div>
+        <div class="success-sub">Thanks for reaching out. We'll get back to you as soon as possible.</div>
+        <button class="btn btn--ghost" onclick="resetForm()"><i class="fa-solid fa-rotate-left"></i> Send another</button>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="contact-info">
+      <div class="info-card">
+        <div class="info-card-head">
+          <div class="info-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="info-card-title">The Team</div>
+        </div>
+        <div class="team-pill">
+          <div class="tp-avatar">MK</div>
+          <div class="tp-info"><div class="tp-name">Michael Karaki</div><div class="tp-email">michael.m.elkaraki@net.usek.edu.lb</div></div>
+        </div>
+        <div class="team-pill">
+          <div class="tp-avatar">RE</div>
+          <div class="tp-info"><div class="tp-name">Rayen Estephanos</div><div class="tp-email">rayen.s.estephanos@net.usek.edu.lb</div></div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-head">
+          <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="info-card-title">Location</div>
+        </div>
+        <div class="info-card-body">Beirut, Lebanon 🇱🇧<br/>Computer Science Department<br/>Spring 2026 semester</div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-head">
+          <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="info-card-title">Response Time</div>
+        </div>
+        <div class="info-card-body">We typically respond within <strong style="color:var(--c-white)">24–48 hours</strong>. For urgent project queries, reach out via university email.</div>
+      </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">M<span style="color:var(--c-mint)">&</span>R</span>
+    <p class="footer-copy">&copy; 2026 Michael Karaki &amp; Rayen Estephanos · CSC331</p>
+    <div class="footer-links"><a href="aboutus.html">About</a><a href="research.html">Research</a></div>
+  </div>
+</footer>
+
+<script>
+let selectedSubject = '';
+
+function selectSubject(el, val){
+  document.querySelectorAll('.spill').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  selectedSubject = val;
+  document.getElementById('subjectInput').value = val;
+  document.getElementById('subjectErr').classList.remove('show');
+}
+
+function validateField(el, type){
+  const v = el.value.trim();
+  const errEl = document.getElementById(el.id+'-err');
+  let valid = false;
+  if(type==='name') valid = v.length >= 2;
+  if(type==='email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  if(type==='phone') valid = v==='' || /^[\d\s\+\-\(\)]{7,}$/.test(v);
+  if(type==='message') valid = v.length >= 10;
+  el.classList.toggle('valid', valid && v!=='');
+  el.classList.toggle('invalid', !valid && v!=='');
+  if(errEl){
+    errEl.classList.toggle('show', !valid && v!=='');
+    errEl.className = 'val-msg ' + (valid ? 'ok' : 'err');
+    if(valid && v!==''){errEl.classList.add('show'); errEl.textContent = type==='phone'&&v==='' ? '' : '✓ Looks good!';}
+    else if(v!==''){errEl.classList.add('show');}
+  }
+  return type==='phone' ? true : valid;
+}
+
+function updateCount(){
+  document.getElementById('msgCount').textContent = document.getElementById('message').value.length;
+}
+
+function submitForm(e){
+  e.preventDefault();
+  let ok = true;
+  if(!selectedSubject){ document.getElementById('subjectErr').classList.add('show'); ok=false; }
+  ['firstname','lastname','email','message'].forEach(id=>{
+    const el = document.getElementById(id);
+    const type = id==='email'?'email':id==='message'?'message':'name';
+    if(!validateField(el,type)) ok=false;
+  });
+  if(!ok) return false;
+
+  // Show spinner
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading');
+
+  // Simulate server call (2s), then show success
+  // In production, remove this and let the form action submit to contactusaction.php
+  setTimeout(()=>{
+    btn.classList.remove('loading');
+    document.getElementById('formBody').style.display='none';
+    document.getElementById('successOverlay').classList.add('show');
+  }, 2000);
+
+  return false;
+}
+
+function resetForm(){
+  document.getElementById('contactForm').reset();
+  document.getElementById('formBody').style.display='block';
+  document.getElementById('successOverlay').classList.remove('show');
+  selectedSubject='';
+  document.querySelectorAll('.spill').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.finput').forEach(f=>{f.classList.remove('valid','invalid');});
+  document.getElementById('msgCount').textContent='0';
+}
+
+function openMenu(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('visible');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('visible');document.body.style.overflow='';}
+</script>
+</body>
+</html>

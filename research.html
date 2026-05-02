@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Research — M&R</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Serif+Arabic:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    main { padding-top: var(--header-h); }
+
+    /* PROGRESS BAR */
+    #progress-bar {
+      position:fixed;top:var(--header-h);left:0;z-index:99;
+      height:2px;width:0%;
+      background:linear-gradient(90deg,var(--c-mint),#6366f1);
+      transition:width .1s linear;
+    }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding:5rem 7vw 4rem;border-bottom:1px solid var(--c-border);
+      position:relative;overflow:hidden;
+    }
+    .page-hero::before {
+      content:'';position:absolute;top:-150px;right:-100px;
+      width:600px;height:600px;
+      background:radial-gradient(circle,rgba(0,255,163,.08) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .eyebrow {
+      font-family:'Instrument Sans',sans-serif;font-size:.72rem;
+      font-weight:500;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--c-mint);margin-bottom:1rem;
+      display:flex;align-items:center;gap:10px;
+    }
+    .eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--c-mint);}
+    .page-hero h1 {
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(2.4rem,5vw,4.5rem);
+      letter-spacing:-.03em;line-height:.95;
+      color:var(--c-white);margin-bottom:1.2rem;
+    }
+    .hero-meta {
+      display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;
+      margin-top:1.5rem;
+    }
+    .hero-meta span {
+      font-family:'Instrument Sans',sans-serif;font-size:.82rem;
+      color:var(--c-muted);display:flex;align-items:center;gap:5px;
+    }
+    .hero-meta i{color:var(--c-mint);}
+
+    /* LANG TOGGLE */
+    .lang-toggle {
+      display:inline-flex;
+      background:var(--c-surface2);
+      border:1px solid var(--c-border);
+      border-radius:100px;padding:4px;gap:4px;
+    }
+    .lang-btn {
+      font-family:'Instrument Sans',sans-serif;font-size:.78rem;
+      font-weight:500;padding:.35rem .9rem;border-radius:100px;
+      border:none;cursor:pointer;
+      color:var(--c-muted);background:transparent;
+      transition:all .2s;
+    }
+    .lang-btn.active{background:var(--c-mint);color:#03160d;}
+
+    /* LAYOUT */
+    .research-layout {
+      display:grid;
+      grid-template-columns:260px 1fr;
+      gap:0;
+      max-width:100%;
+    }
+
+    /* SIDEBAR TOC */
+    .toc-sidebar {
+      position:sticky;top:calc(var(--header-h) + 2px);
+      height:calc(100vh - var(--header-h) - 2px);
+      overflow-y:auto;
+      padding:2.5rem 2rem;
+      border-right:1px solid var(--c-border);
+      background:var(--c-surface);
+      scrollbar-width:thin;scrollbar-color:var(--c-border) transparent;
+    }
+    .toc-title {
+      font-family:'Syne',sans-serif;font-size:.75rem;
+      font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--c-muted);margin-bottom:1.2rem;
+    }
+    .toc-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .toc-link {
+      display:flex;align-items:center;gap:8px;
+      font-family:'Instrument Sans',sans-serif;font-size:.83rem;
+      color:var(--c-muted);padding:.5rem .7rem;
+      border-radius:var(--radius-sm);text-decoration:none;
+      transition:color .2s,background .2s;
+      border-left:2px solid transparent;
+    }
+    .toc-link:hover{color:var(--c-white);background:rgba(255,255,255,.04);}
+    .toc-link.active{color:var(--c-mint);background:rgba(0,255,163,.07);border-left-color:var(--c-mint);}
+    .toc-num{font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;color:var(--c-subtle);min-width:18px;}
+
+    /* CONTENT */
+    .research-content {
+      padding:4rem 5vw 6rem;max-width:820px;
+    }
+
+    .content-section { margin-bottom:5rem; }
+
+    .section-anchor { scroll-margin-top:calc(var(--header-h) + 20px); }
+
+    .section-num {
+      font-family:'Syne',sans-serif;font-size:.7rem;
+      font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--c-mint);margin-bottom:.8rem;
+      display:flex;align-items:center;gap:8px;
+    }
+    .section-num::before{content:'';display:block;width:16px;height:1px;background:var(--c-mint);}
+
+    .content-section h2 {
+      font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3vw,2.2rem);
+      font-weight:800;letter-spacing:-.02em;color:var(--c-white);
+      margin-bottom:1.4rem;line-height:1.15;
+    }
+    .content-section p {
+      font-family:'Instrument Sans',sans-serif;font-size:.97rem;
+      font-weight:300;color:var(--c-muted);line-height:1.9;
+      margin-bottom:1.2rem;
+    }
+    .content-section h3 {
+      font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;
+      color:var(--c-white);margin:2rem 0 .8rem;
+    }
+
+    /* Callout / info box */
+    .callout {
+      background:rgba(0,255,163,.06);
+      border:1px solid rgba(0,255,163,.18);
+      border-left:3px solid var(--c-mint);
+      border-radius:0 var(--radius-md) var(--radius-md) 0;
+      padding:1.2rem 1.5rem;margin:1.8rem 0;
+    }
+    .callout p{margin:0;color:var(--c-white);}
+    .callout-label {
+      font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;
+      color:var(--c-mint);margin-bottom:.5rem;
+    }
+
+    /* Timeline cards */
+    .timeline-cards{display:flex;flex-direction:column;gap:.8rem;margin:1.5rem 0;}
+    .tc {
+      background:var(--c-surface);border:1px solid var(--c-border);
+      border-radius:var(--radius-md);padding:1.2rem 1.5rem;
+      display:flex;align-items:flex-start;gap:1.2rem;
+      transition:border-color .3s;
+    }
+    .tc:hover{border-color:rgba(0,255,163,.3);}
+    .tc-year {
+      font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;
+      color:var(--c-mint);min-width:50px;
+    }
+    .tc-text {font-family:'Instrument Sans',sans-serif;font-size:.88rem;color:var(--c-muted);line-height:1.6;}
+    .tc-text strong{color:var(--c-white);}
+
+    /* Protocol cards */
+    .proto-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.5rem 0;}
+    .proto-card {
+      background:var(--c-surface);border:1px solid var(--c-border);
+      border-radius:var(--radius-md);padding:1.3rem;
+      transition:border-color .3s,transform .2s;cursor:default;
+    }
+    .proto-card:hover{border-color:rgba(0,255,163,.3);transform:translateY(-2px);}
+    .proto-name{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--c-white);margin-bottom:.4rem;}
+    .proto-desc{font-family:'Instrument Sans',sans-serif;font-size:.8rem;color:var(--c-muted);}
+    .proto-badge{
+      display:inline-block;font-size:.65rem;font-weight:500;
+      letter-spacing:.08em;text-transform:uppercase;
+      padding:.18rem .6rem;border-radius:100px;
+      background:rgba(0,255,163,.08);color:var(--c-mint);
+      border:1px solid rgba(0,255,163,.18);margin-bottom:.6rem;
+    }
+
+    /* ARABIC styles */
+    html[dir="rtl"] .toc-sidebar{border-right:none;border-left:1px solid var(--c-border);}
+    html[dir="rtl"] .toc-link{border-left:none;border-right:2px solid transparent;}
+    html[dir="rtl"] .toc-link.active{border-right-color:var(--c-mint);}
+    html[dir="rtl"] .content-section p,
+    html[dir="rtl"] .tc-text {font-family:'Noto Serif Arabic',serif;font-size:1rem;line-height:2;}
+    html[dir="rtl"] .content-section h2,
+    html[dir="rtl"] .content-section h3 {font-family:'Noto Serif Arabic',serif;}
+    html[dir="rtl"] .section-num::before{margin-right:0;margin-left:8px;}
+    html[dir="rtl"] .callout{border-left:none;border-right:3px solid var(--c-mint);border-radius:var(--radius-md) 0 0 var(--radius-md);}
+
+    .lang-en,.lang-ar{display:block;}
+    html[dir="rtl"] .lang-en{display:none;}
+    html[dir="ltr"] .lang-ar{display:none;}
+
+    @media(max-width:900px){
+      .research-layout{grid-template-columns:1fr;}
+      .toc-sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--c-border);}
+      .proto-grid{grid-template-columns:1fr;}
+    }
+    @media(max-width:600px){
+      .research-content{padding:3rem 5vw 4rem;}
+      .page-hero{padding:4rem 5vw 3rem;}
+    }
+  </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<header class="site-header">
+  <a href="home.html" class="logo">M<span style="color:var(--c-mint)">&</span>R</a>
+  <nav class="site-nav">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="aboutus.html" class="nav-link">About</a>
+    <a href="schedules.html" class="nav-link">Schedule</a>
+    <a href="research.html" class="nav-link active">Research</a>
+    <a href="media.html" class="nav-link">Media</a>
+    <a href="quiz1.html" class="nav-link">Quiz</a>
+    <a href="contactus.html" class="nav-link nav-cta"><i class="fa-regular fa-envelope"></i>&nbsp;Contact</a>
+  </nav>
+  <button class="nav-toggle" onclick="openMenu()"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="logo">M<span style="color:var(--c-mint)">&</span>R</span>
+    <button class="drawer-close" onclick="closeMenu()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="home.html" class="drawer-link"><span class="d-num">01</span>Home</a>
+    <a href="aboutus.html" class="drawer-link"><span class="d-num">02</span>About Us</a>
+    <a href="schedules.html" class="drawer-link"><span class="d-num">03</span>Schedule</a>
+    <a href="research.html" class="drawer-link active"><span class="d-num">04</span>Research</a>
+    <a href="media.html" class="drawer-link"><span class="d-num">05</span>Media</a>
+    <a href="quiz1.html" class="drawer-link"><span class="d-num">06</span>Quiz 1</a>
+    <a href="quiz2.php" class="drawer-link"><span class="d-num">07</span>Quiz 2</a>
+    <a href="contactus.html" class="drawer-link"><span class="d-num">08</span>Contact</a>
+  </nav>
+  <div class="drawer-footer">CSC331 · Web Programming</div>
+</aside>
+
+<main>
+  <section class="page-hero">
+    <p class="eyebrow">Research</p>
+    <h1 class="lang-en">The Internet &amp;<br>World Wide Web</h1>
+    <h1 class="lang-ar" style="font-family:'Noto Serif Arabic',serif">الإنترنت والشبكة العنكبوتية العالمية</h1>
+    <div class="hero-meta">
+      <span><i class="fa-solid fa-clock"></i> ~12 min read</span>
+      <span><i class="fa-solid fa-list"></i> 6 sections</span>
+      <span><i class="fa-solid fa-calendar"></i> 2026</span>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+        <button class="lang-btn" onclick="setLang('ar',this)">AR</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="research-layout">
+    <!-- SIDEBAR TOC -->
+    <aside class="toc-sidebar">
+      <div class="toc-title">Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#s1" class="toc-link active"><span class="toc-num">01</span><span class="lang-en">What is the Internet?</span><span class="lang-ar">ما هو الإنترنت؟</span></a></li>
+        <li><a href="#s2" class="toc-link"><span class="toc-num">02</span><span class="lang-en">History &amp; Origins</span><span class="lang-ar">التاريخ والأصول</span></a></li>
+        <li><a href="#s3" class="toc-link"><span class="toc-num">03</span><span class="lang-en">How It Works</span><span class="lang-ar">كيف يعمل</span></a></li>
+        <li><a href="#s4" class="toc-link"><span class="toc-num">04</span><span class="lang-en">The World Wide Web</span><span class="lang-ar">الشبكة العنكبوتية</span></a></li>
+        <li><a href="#s5" class="toc-link"><span class="toc-num">05</span><span class="lang-en">Key Protocols</span><span class="lang-ar">البروتوكولات الأساسية</span></a></li>
+        <li><a href="#s6" class="toc-link"><span class="toc-num">06</span><span class="lang-en">The Future</span><span class="lang-ar">المستقبل</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <article class="research-content">
+
+      <!-- S1 -->
+      <div class="content-section" id="s1">
+        <div class="section-num">01</div>
+        <h2 class="lang-en">What is the Internet?</h2>
+        <h2 class="lang-ar">ما هو الإنترنت؟</h2>
+        <p class="lang-en">The Internet is a global system of interconnected computer networks that use standardized communication protocols to link billions of devices worldwide. It is not a single network but rather a vast "network of networks" — a decentralized infrastructure that allows computers, smartphones, servers, and other devices to communicate with each other across the planet.</p>
+        <p class="lang-ar">الإنترنت هو نظام عالمي من الشبكات الحاسوبية المترابطة التي تستخدم بروتوكولات اتصال موحّدة لربط مليارات الأجهزة حول العالم. إنه ليس شبكة واحدة، بل بنية تحتية لامركزية هائلة تتيح للأجهزة التواصل عبر الكوكب.</p>
+        <div class="callout">
+          <div class="callout-label"><i class="fa-solid fa-lightbulb"></i> Key insight</div>
+          <p class="lang-en">The Internet and the World Wide Web are NOT the same thing. The Internet is the physical infrastructure; the Web is one of many services that runs on top of it.</p>
+          <p class="lang-ar">الإنترنت والشبكة العنكبوتية العالمية ليسا الشيء ذاته. الإنترنت هو البنية التحتية المادية؛ والويب هو أحد الخدمات التي تعمل فوقها.</p>
+        </div>
+        <p class="lang-en">At its core, the Internet is built on the TCP/IP protocol suite, which defines how data is transmitted, addressed, routed, and received. This architecture is intentionally robust — data can take many paths between two points, so the network can survive partial failures.</p>
+        <p class="lang-ar">في جوهره، يُبنى الإنترنت على مجموعة بروتوكولات TCP/IP التي تحدد كيفية نقل البيانات وعنونتها وتوجيهها واستقبالها. هذه البنية متينة عمداً — إذ يمكن للبيانات سلوك مسارات متعددة بين نقطتين.</p>
+      </div>
+
+      <!-- S2 -->
+      <div class="content-section" id="s2">
+        <div class="section-num">02</div>
+        <h2 class="lang-en">History &amp; Origins</h2>
+        <h2 class="lang-ar">التاريخ والأصول</h2>
+        <p class="lang-en">The Internet grew from ARPANET, a project funded by the US Department of Defense in the late 1960s. Its original purpose was to create a communication network resilient enough to survive a nuclear attack. Over decades, it evolved from a military and academic network into the global commercial and social infrastructure we use today.</p>
+        <p class="lang-ar">نشأ الإنترنت من شبكة ARPANET، وهو مشروع موّلته وزارة الدفاع الأمريكية في أواخر ستينيات القرن الماضي. وعلى مدى عقود، تطوّر من شبكة عسكرية وأكاديمية إلى البنية التحتية الاجتماعية والتجارية العالمية التي نستخدمها اليوم.</p>
+        <div class="timeline-cards">
+          <div class="tc"><div class="tc-year">1969</div><div class="tc-text"><strong>ARPANET launched</strong> — first message sent between UCLA and Stanford, though the system crashed after two letters.</div></div>
+          <div class="tc"><div class="tc-year">1973</div><div class="tc-text"><strong>TCP/IP conceived</strong> by Vint Cerf and Bob Kahn — the foundational protocol that makes the modern Internet possible.</div></div>
+          <div class="tc"><div class="tc-year">1983</div><div class="tc-text"><strong>DNS introduced</strong> — the Domain Name System replaced numeric IP addresses with human-readable names like google.com.</div></div>
+          <div class="tc"><div class="tc-year">1991</div><div class="tc-text"><strong>World Wide Web born</strong> — Tim Berners-Lee published the first website and made the Web publicly available.</div></div>
+          <div class="tc"><div class="tc-year">1995</div><div class="tc-text"><strong>Commercialization</strong> — NSFNet backbone decommissioned; Internet opened fully to commercial traffic.</div></div>
+          <div class="tc"><div class="tc-year">2007</div><div class="tc-text"><strong>Mobile Internet</strong> — the iPhone launch sparked the smartphone era, putting the Internet in everyone's pocket.</div></div>
+          <div class="tc"><div class="tc-year">2024</div><div class="tc-text"><strong>5.5 billion users</strong> — over 67% of the world's population is now connected to the Internet.</div></div>
+        </div>
+      </div>
+
+      <!-- S3 -->
+      <div class="content-section" id="s3">
+        <div class="section-num">03</div>
+        <h2 class="lang-en">How the Internet Works</h2>
+        <h2 class="lang-ar">كيف يعمل الإنترنت</h2>
+        <p class="lang-en">When you type a URL in your browser, a remarkable chain of events unfolds in milliseconds. Your request travels from your device through your ISP (Internet Service Provider) to a series of routers that forward it across the globe, reaching the destination server which sends back the requested data in packets.</p>
+        <p class="lang-ar">عندما تكتب عنوان URL في متصفحك، تنكشف سلسلة رائعة من الأحداث في أجزاء من الثانية. ينتقل طلبك من جهازك عبر مزود خدمة الإنترنت إلى سلسلة من الموجّهات (Routers) التي تعيد توجيهه عبر العالم.</p>
+        <h3 class="lang-en">Data Packets &amp; Routing</h3>
+        <h3 class="lang-ar">حزم البيانات والتوجيه</h3>
+        <p class="lang-en">Data is broken into small chunks called packets. Each packet carries a piece of your data plus a header containing source/destination IP addresses, packet sequence number, and error-checking data. Routers examine each packet's destination and decide the best path forward — independently of other packets in the same message.</p>
+        <p class="lang-ar">تُقسَّم البيانات إلى أجزاء صغيرة تُسمى الحزم. تحمل كل حزمة جزءاً من بياناتك بالإضافة إلى رأس يحتوي على عناوين IP المصدر والوجهة ورقم تسلسل الحزمة وبيانات التحقق من الأخطاء.</p>
+        <div class="callout">
+          <div class="callout-label"><i class="fa-solid fa-route"></i> Did you know?</div>
+          <p class="lang-en">A single webpage load can involve 50–100 separate HTTP requests, each potentially taking a different physical route across the globe and reassembling perfectly at your browser.</p>
+          <p class="lang-ar">قد يتضمن تحميل صفحة ويب واحدة 50–100 طلب HTTP منفصل، وقد يسلك كل منها مساراً مادياً مختلفاً عبر العالم ليُعاد تجميعها بشكل مثالي في متصفحك.</p>
+        </div>
+      </div>
+
+      <!-- S4 -->
+      <div class="content-section" id="s4">
+        <div class="section-num">04</div>
+        <h2 class="lang-en">The World Wide Web</h2>
+        <h2 class="lang-ar">الشبكة العنكبوتية العالمية</h2>
+        <p class="lang-en">The World Wide Web, invented by Tim Berners-Lee in 1989 at CERN, is a system of interlinked hypertext documents accessed via the Internet. It uses HTTP (HyperText Transfer Protocol) to transfer web pages written in HTML, and URLs (Uniform Resource Locators) to identify resources.</p>
+        <p class="lang-ar">الشبكة العنكبوتية العالمية، التي اخترعها تيم بيرنرز-لي عام 1989 في CERN، هي نظام من المستندات النصية التشعبية المترابطة يُتاح عبر الإنترنت. تستخدم بروتوكول HTTP لنقل صفحات الويب المكتوبة بـHTML.</p>
+        <h3 class="lang-en">Web 1.0 → Web 3.0</h3>
+        <h3 class="lang-ar">من ويب 1.0 إلى ويب 3.0</h3>
+        <p class="lang-en"><strong style="color:var(--c-white)">Web 1.0 (1991–2004)</strong> — static, read-only pages. Websites were simple HTML documents with no interactivity. Users consumed content but could not contribute.</p>
+        <p class="lang-en"><strong style="color:var(--c-white)">Web 2.0 (2004–present)</strong> — the social, interactive web. Platforms like Facebook, YouTube, and Wikipedia empowered users to create content. AJAX, JavaScript frameworks, and REST APIs enabled dynamic experiences.</p>
+        <p class="lang-en"><strong style="color:var(--c-white)">Web 3.0 (emerging)</strong> — the decentralized, semantic web. Blockchain technology, NFTs, and AI promise a web where users own their data and machines understand context.</p>
+        <p class="lang-ar"><strong style="color:var(--c-white)">ويب 1.0 (1991–2004)</strong> — صفحات ثابتة للقراءة فقط. <strong style="color:var(--c-white)">ويب 2.0 (2004–الآن)</strong> — الويب الاجتماعي التفاعلي. <strong style="color:var(--c-white)">ويب 3.0 (قادم)</strong> — الويب اللامركزي الدلالي.</p>
+      </div>
+
+      <!-- S5 -->
+      <div class="content-section" id="s5">
+        <div class="section-num">05</div>
+        <h2 class="lang-en">Key Protocols</h2>
+        <h2 class="lang-ar">البروتوكولات الأساسية</h2>
+        <p class="lang-en">Protocols are agreed-upon rules that govern how data is transmitted. The Internet runs on dozens of specialized protocols, each handling a specific layer of communication:</p>
+        <p class="lang-ar">البروتوكولات هي قواعد متفق عليها تحكم كيفية نقل البيانات. يعمل الإنترنت على عشرات البروتوكولات المتخصصة:</p>
+        <div class="proto-grid">
+          <div class="proto-card"><div class="proto-badge">Transport</div><div class="proto-name">TCP/IP</div><div class="proto-desc">Transmission Control Protocol / Internet Protocol. The foundational suite for all Internet communication.</div></div>
+          <div class="proto-card"><div class="proto-badge">Application</div><div class="proto-name">HTTP / HTTPS</div><div class="proto-desc">HyperText Transfer Protocol. Defines how web browsers and servers exchange web pages. HTTPS adds encryption.</div></div>
+          <div class="proto-card"><div class="proto-badge">Application</div><div class="proto-name">DNS</div><div class="proto-desc">Domain Name System. Translates human-readable domain names into IP addresses computers can route to.</div></div>
+          <div class="proto-card"><div class="proto-badge">Application</div><div class="proto-name">SMTP / IMAP</div><div class="proto-desc">Simple Mail Transfer Protocol and Internet Message Access Protocol. Power the global email system.</div></div>
+          <div class="proto-card"><div class="proto-badge">Application</div><div class="proto-name">FTP / SFTP</div><div class="proto-desc">File Transfer Protocol. Used to upload and download files between client and server systems.</div></div>
+          <div class="proto-card"><div class="proto-badge">Security</div><div class="proto-name">TLS / SSL</div><div class="proto-desc">Transport Layer Security. Encrypts all data in transit, forming the basis of the padlock icon in browsers.</div></div>
+        </div>
+      </div>
+
+      <!-- S6 -->
+      <div class="content-section" id="s6">
+        <div class="section-num">06</div>
+        <h2 class="lang-en">The Future of the Internet</h2>
+        <h2 class="lang-ar">مستقبل الإنترنت</h2>
+        <p class="lang-en">The Internet continues to evolve at a breathtaking pace. Several major trends are shaping what the network will look like over the next decade:</p>
+        <p class="lang-ar">يستمر الإنترنت في التطور بوتيرة مذهلة. تشكّل عدة اتجاهات رئيسية مستقبل الشبكة خلال العقد القادم:</p>
+        <h3 class="lang-en">IPv6 Adoption</h3>
+        <p class="lang-en">The Internet is running out of IPv4 addresses (only ~4.3 billion possible). IPv6 provides 340 undecillion addresses — enough for every grain of sand on Earth to have its own IP.</p>
+        <h3 class="lang-en">Internet of Things (IoT)</h3>
+        <p class="lang-en">Billions of everyday objects — from refrigerators to traffic lights — are connecting to the Internet, creating a hyper-connected world that generates unprecedented volumes of data.</p>
+        <h3 class="lang-en">Artificial Intelligence Integration</h3>
+        <p class="lang-en">AI is transforming how we interact with the Internet — from intelligent search and content recommendation to autonomous agents that browse and act on our behalf.</p>
+        <p class="lang-ar">يُعيد الذكاء الاصطناعي تشكيل طريقة تفاعلنا مع الإنترنت — من البحث الذكي إلى الوكلاء المستقلين الذين يتصفحون الشبكة نيابةً عنا.</p>
+        <div class="callout">
+          <div class="callout-label"><i class="fa-solid fa-rocket"></i> Looking ahead</div>
+          <p class="lang-en">By 2030, analysts estimate there will be over 29 billion connected devices worldwide — nearly four devices for every person on Earth. The Internet is no longer just a human network; it is becoming the nervous system of our entire civilization.</p>
+          <p class="lang-ar">بحلول عام 2030، يُقدّر المحللون أن يكون هناك أكثر من 29 مليار جهاز متصل حول العالم. لم يعد الإنترنت مجرد شبكة بشرية؛ بل أصبح الجهاز العصبي لحضارتنا بأسرها.</p>
+        </div>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">M<span style="color:var(--c-mint)">&</span>R</span>
+    <p class="footer-copy">&copy; 2026 Michael Karaki &amp; Rayen Estephanos · CSC331</p>
+    <div class="footer-links"><a href="aboutus.html">About</a><a href="contactus.html">Contact</a></div>
+  </div>
+</footer>
+
+<script>
+// Language toggle
+function setLang(lang, btn){
+  document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Reading progress bar
+window.addEventListener('scroll',()=>{
+  const doc = document.documentElement;
+  const scrolled = doc.scrollTop;
+  const total = doc.scrollHeight - doc.clientHeight;
+  document.getElementById('progress-bar').style.width = (scrolled/total*100)+'%';
+
+  // TOC highlight
+  const sections = document.querySelectorAll('[id^="s"]');
+  sections.forEach(sec=>{
+    const rect = sec.getBoundingClientRect();
+    if(rect.top <= 120 && rect.bottom >= 120){
+      document.querySelectorAll('.toc-link').forEach(l=>l.classList.remove('active'));
+      const active = document.querySelector('.toc-link[href="#'+sec.id+'"]');
+      if(active) active.classList.add('active');
+    }
+  });
+});
+
+function openMenu(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('visible');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('visible');document.body.style.overflow='';}
+</script>
+</body>
+</html>

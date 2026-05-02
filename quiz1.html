@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz 1 — M&R</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    main{padding-top:var(--header-h);}
+    .quiz-wrap{min-height:calc(100vh - var(--header-h));display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4rem 5vw 6rem;}
+
+    /* INTRO SCREEN */
+    .quiz-intro{max-width:620px;width:100%;text-align:center;animation:fadeUp .6s ease both;}
+    .intro-icon{width:80px;height:80px;border-radius:50%;background:rgba(0,255,163,.1);border:1px solid rgba(0,255,163,.25);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--c-mint);margin:0 auto 2rem;}
+    .quiz-intro h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.03em;color:var(--c-white);margin-bottom:1rem;}
+    .quiz-intro p{font-family:'Instrument Sans',sans-serif;font-size:1rem;font-weight:300;color:var(--c-muted);line-height:1.8;margin-bottom:2rem;}
+    .intro-stats{display:flex;justify-content:center;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap;}
+    .istat{text-align:center;}
+    .istat-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--c-mint);}
+    .istat-label{font-family:'Instrument Sans',sans-serif;font-size:.78rem;color:var(--c-muted);}
+
+    /* PROGRESS HEADER */
+    .quiz-header{width:100%;max-width:700px;margin-bottom:2rem;}
+    .quiz-progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;}
+    .q-counter{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--c-muted);}
+    .q-counter span{color:var(--c-white);}
+    .timer-display{display:flex;align-items:center;gap:6px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--c-white);}
+    .timer-display i{color:var(--c-mint);font-size:.75rem;}
+    .timer-display.warning{color:#f87171;}
+    .timer-display.warning i{color:#f87171;}
+    .progress-track{height:4px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--c-mint),#6366f1);border-radius:4px;transition:width .5s ease;}
+
+    /* QUESTION CARD */
+    .question-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-xl);padding:2.5rem;width:100%;max-width:700px;animation:fadeUp .4s ease both;}
+    .q-category{font-family:'Instrument Sans',sans-serif;font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--c-mint);margin-bottom:.8rem;display:flex;align-items:center;gap:6px;}
+    .q-text{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--c-white);line-height:1.4;margin-bottom:2rem;}
+
+    /* OPTIONS */
+    .options{display:flex;flex-direction:column;gap:.7rem;}
+    .option{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-radius:var(--radius-md);border:1px solid var(--c-border);background:var(--c-surface2);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+    .option::before{content:'';position:absolute;inset:0;background:rgba(0,255,163,.04);opacity:0;transition:opacity .2s;}
+    .option:hover:not(.disabled){border-color:rgba(0,255,163,.3);transform:translateX(4px);}
+    .option:hover:not(.disabled)::before{opacity:1;}
+    .option.selected{border-color:var(--c-mint);background:rgba(0,255,163,.08);}
+    .option.correct{border-color:#4ade80;background:rgba(74,222,128,.1);}
+    .option.wrong{border-color:#f87171;background:rgba(248,113,113,.1);}
+    .option.disabled{cursor:default;}
+    .opt-key{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--c-border);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:var(--c-muted);flex-shrink:0;transition:all .2s;}
+    .option.selected .opt-key{background:var(--c-mint);border-color:var(--c-mint);color:#03160d;}
+    .option.correct .opt-key{background:#4ade80;border-color:#4ade80;color:#021a08;}
+    .option.wrong .opt-key{background:#f87171;border-color:#f87171;color:#2a0000;}
+    .opt-text{font-family:'Instrument Sans',sans-serif;font-size:.95rem;font-weight:400;color:var(--c-white);}
+    .opt-icon{margin-left:auto;font-size:.85rem;opacity:0;transition:opacity .2s;}
+    .option.correct .opt-icon{opacity:1;color:#4ade80;}
+    .option.wrong .opt-icon{opacity:1;color:#f87171;}
+
+    /* TEXT INPUT question */
+    .text-answer{width:100%;background:var(--c-surface2);border:1px solid var(--c-border2);border-radius:var(--radius-md);padding:.85rem 1.1rem;font-family:'Instrument Sans',sans-serif;font-size:.95rem;color:var(--c-white);outline:none;transition:border-color .2s;}
+    .text-answer:focus{border-color:rgba(0,255,163,.4);}
+    .text-answer.correct{border-color:#4ade80;background:rgba(74,222,128,.06);}
+    .text-answer.wrong{border-color:#f87171;background:rgba(248,113,113,.06);}
+
+    /* EXPLANATION */
+    .explanation{margin-top:1.2rem;padding:1rem 1.2rem;border-radius:var(--radius-md);border:1px solid rgba(0,255,163,.18);background:rgba(0,255,163,.05);font-family:'Instrument Sans',sans-serif;font-size:.88rem;color:var(--c-muted);line-height:1.7;display:none;}
+    .explanation.show{display:block;animation:fadeUp .3s ease both;}
+    .explanation strong{color:var(--c-mint);}
+
+    /* NEXT BUTTON */
+    .quiz-actions{display:flex;justify-content:flex-end;margin-top:1.5rem;gap:.8rem;}
+
+    /* RESULTS */
+    .results-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-xl);padding:3rem;width:100%;max-width:700px;text-align:center;animation:fadeUp .5s ease both;}
+    .score-ring{width:130px;height:130px;margin:0 auto 2rem;position:relative;}
+    .score-ring svg{transform:rotate(-90deg);}
+    .score-ring circle{fill:none;stroke-width:8;stroke-linecap:round;}
+    .ring-bg{stroke:rgba(255,255,255,.06);}
+    .ring-fg{stroke:var(--c-mint);stroke-dasharray:339.3;stroke-dashoffset:339.3;transition:stroke-dashoffset 1.2s ease;}
+    .score-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .score-pct{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--c-white);}
+    .score-label{font-family:'Instrument Sans',sans-serif;font-size:.7rem;color:var(--c-muted);}
+    .results-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--c-white);margin-bottom:.5rem;}
+    .results-sub{font-family:'Instrument Sans',sans-serif;font-size:.92rem;color:var(--c-muted);margin-bottom:2rem;}
+    .results-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+    .rb{background:var(--c-surface2);border:1px solid var(--c-border);border-radius:var(--radius-md);padding:1.2rem;}
+    .rb-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.25rem;}
+    .rb-label{font-family:'Instrument Sans',sans-serif;font-size:.75rem;color:var(--c-muted);}
+    .rb.correct .rb-num{color:#4ade80;}
+    .rb.wrong .rb-num{color:#f87171;}
+    .rb.time .rb-num{color:var(--c-mint);}
+    .review-list{text-align:left;margin-bottom:2rem;display:flex;flex-direction:column;gap:.6rem;}
+    .review-item{display:flex;gap:.8rem;padding:.85rem 1rem;border-radius:var(--radius-md);border:1px solid var(--c-border);font-family:'Instrument Sans',sans-serif;font-size:.83rem;}
+    .review-item.ok{border-color:rgba(74,222,128,.2);background:rgba(74,222,128,.04);}
+    .review-item.bad{border-color:rgba(248,113,113,.2);background:rgba(248,113,113,.04);}
+    .ri-icon{flex-shrink:0;font-size:.8rem;margin-top:2px;}
+    .review-item.ok .ri-icon{color:#4ade80;}
+    .review-item.bad .ri-icon{color:#f87171;}
+    .ri-q{color:var(--c-white);font-weight:500;margin-bottom:.2rem;}
+    .ri-ans{color:var(--c-muted);font-size:.78rem;}
+
+    @media(max-width:600px){
+      .results-breakdown{grid-template-columns:1fr 1fr;}
+      .intro-stats{gap:1.2rem;}
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a href="home.html" class="logo">M<span style="color:var(--c-mint)">&</span>R</a>
+  <nav class="site-nav">
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="aboutus.html" class="nav-link">About</a>
+    <a href="schedules.html" class="nav-link">Schedule</a>
+    <a href="research.html" class="nav-link">Research</a>
+    <a href="media.html" class="nav-link">Media</a>
+    <a href="quiz1.html" class="nav-link active">Quiz</a>
+    <a href="contactus.html" class="nav-link nav-cta"><i class="fa-regular fa-envelope"></i>&nbsp;Contact</a>
+  </nav>
+  <button class="nav-toggle" onclick="openMenu()"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span class="logo">M<span style="color:var(--c-mint)">&</span>R</span>
+    <button class="drawer-close" onclick="closeMenu()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="home.html" class="drawer-link"><span class="d-num">01</span>Home</a>
+    <a href="aboutus.html" class="drawer-link"><span class="d-num">02</span>About Us</a>
+    <a href="schedules.html" class="drawer-link"><span class="d-num">03</span>Schedule</a>
+    <a href="research.html" class="drawer-link"><span class="d-num">04</span>Research</a>
+    <a href="media.html" class="drawer-link"><span class="d-num">05</span>Media</a>
+    <a href="quiz1.html" class="drawer-link active"><span class="d-num">06</span>Quiz 1</a>
+    <a href="quiz2.php" class="drawer-link"><span class="d-num">07</span>Quiz 2</a>
+    <a href="contactus.html" class="drawer-link"><span class="d-num">08</span>Contact</a>
+  </nav>
+  <div class="drawer-footer">CSC331 · Web Programming</div>
+</aside>
+
+<main>
+<div class="quiz-wrap" id="quizWrap">
+
+  <!-- INTRO -->
+  <div class="quiz-intro" id="introScreen">
+    <div class="intro-icon"><i class="fa-solid fa-brain"></i></div>
+    <h1>Internet &amp; Web Quiz</h1>
+    <p>Test your knowledge on the Internet, World Wide Web, web technologies, and programming concepts. 10 questions — some multiple choice, some short answer.</p>
+    <div class="intro-stats">
+      <div class="istat"><div class="istat-num">10</div><div class="istat-label">Questions</div></div>
+      <div class="istat"><div class="istat-num">20s</div><div class="istat-label">Per question</div></div>
+      <div class="istat"><div class="istat-num">JS</div><div class="istat-label">Client-side</div></div>
+    </div>
+    <button class="btn btn--mint" onclick="startQuiz()" style="font-size:1rem;padding:.9rem 2.5rem">
+      <i class="fa-solid fa-play"></i> Start Quiz
+    </button>
+  </div>
+
+  <!-- QUIZ AREA (hidden initially) -->
+  <div id="quizArea" style="display:none;width:100%;display:none;flex-direction:column;align-items:center">
+    <div class="quiz-header">
+      <div class="quiz-progress-top">
+        <div class="q-counter">Question <span id="qNum">1</span> of 10</div>
+        <div class="timer-display" id="timerDisplay"><i class="fa-solid fa-clock"></i> <span id="timerVal">20</span>s</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:10%"></div></div>
+    </div>
+    <div class="question-card" id="questionCard"></div>
+    <div class="quiz-actions" style="width:100%;max-width:700px" id="quizActions"></div>
+  </div>
+
+  <!-- RESULTS (hidden initially) -->
+  <div id="resultsScreen" style="display:none;width:100%;display:none;flex-direction:column;align-items:center"></div>
+
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">M<span style="color:var(--c-mint)">&</span>R</span>
+    <p class="footer-copy">&copy; 2026 Michael Karaki &amp; Rayen Estephanos · CSC331</p>
+    <div class="footer-links"><a href="aboutus.html">About</a><a href="quiz2.php">Quiz 2 (PHP)</a></div>
+  </div>
+</footer>
+
+<script>
+const questions = [
+  {type:'mcq',cat:'Internet Basics',q:'What does "IP" stand for in IP address?',options:['Internet Protocol','Internal Port','Input Parameter','Interface Proxy'],answer:0,explain:'IP stands for <strong>Internet Protocol</strong> — the set of rules governing how data is sent and received over the Internet.'},
+  {type:'mcq',cat:'Web History',q:'Who invented the World Wide Web in 1989?',options:['Bill Gates','Vint Cerf','Tim Berners-Lee','Steve Jobs'],answer:2,explain:'<strong>Tim Berners-Lee</strong> invented the World Wide Web at CERN in 1989, publishing the first website in 1991.'},
+  {type:'mcq',cat:'Protocols',q:'Which protocol is used to securely transfer web pages?',options:['FTP','SMTP','HTTPS','SSH'],answer:2,explain:'<strong>HTTPS</strong> (HyperText Transfer Protocol Secure) encrypts the connection using TLS, keeping data safe in transit.'},
+  {type:'text',cat:'Web Tech',q:'What does HTML stand for?',answer:'hypertext markup language',explain:'<strong>HyperText Markup Language</strong> is the standard language used to create and structure web pages.'},
+  {type:'mcq',cat:'Networks',q:'What does DNS stand for?',options:['Dynamic Network System','Domain Name System','Digital Node Service','Data Naming Schema'],answer:1,explain:'The <strong>Domain Name System</strong> translates human-readable domain names (e.g. google.com) into numeric IP addresses.'},
+  {type:'mcq',cat:'Web Tech',q:'Which of the following is a server-side scripting language?',options:['HTML','CSS','JavaScript','PHP'],answer:3,explain:'<strong>PHP</strong> runs on the server. HTML, CSS, and JavaScript are client-side technologies (processed in the browser).'},
+  {type:'mcq',cat:'Internet',q:'What was the name of the first network that eventually became the Internet?',options:['NSFNET','MILNET','ARPANET','BITNET'],answer:2,explain:'<strong>ARPANET</strong> (Advanced Research Projects Agency Network), launched in 1969, is considered the precursor to the modern Internet.'},
+  {type:'text',cat:'Protocols',q:'What port number does HTTP use by default?',answer:'80',explain:'HTTP uses port <strong>80</strong> by default. HTTPS uses port 443.'},
+  {type:'mcq',cat:'Web Dev',q:'Which CSS property is used to make a layout flexible and responsive?',options:['display: block','position: relative','display: flex','float: left'],answer:2,explain:'<strong>display: flex</strong> (Flexbox) is the modern CSS layout model that makes it easy to build responsive, flexible layouts.'},
+  {type:'mcq',cat:'Databases',q:'What does SQL stand for?',options:['Structured Query Language','Simple Queue Language','System Query Logic','Standard Question List'],answer:0,explain:'<strong>Structured Query Language (SQL)</strong> is the standard language for managing and querying relational databases like MySQL.'},
+];
+
+let current = 0;
+let score = 0;
+let userAnswers = [];
+let timerInterval = null;
+let timeLeft = 20;
+let totalTime = 0;
+let timeTaken = [];
+
+function startQuiz(){
+  document.getElementById('introScreen').style.display = 'none';
+  const qa = document.getElementById('quizArea');
+  qa.style.display = 'flex';
+  renderQuestion();
+}
+
+function renderQuestion(){
+  clearInterval(timerInterval);
+  timeLeft = 20;
+  const q = questions[current];
+  document.getElementById('qNum').textContent = current + 1;
+  document.getElementById('progressFill').style.width = ((current+1)/questions.length*100) + '%';
+  updateTimer();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimer();
+    if(timeLeft <= 0){ clearInterval(timerInterval); autoAdvance(); }
+  }, 1000);
+
+  const card = document.getElementById('questionCard');
+  const actions = document.getElementById('quizActions');
+
+  let optionsHTML = '';
+  if(q.type === 'mcq'){
+    optionsHTML = `<div class="options">` + q.options.map((opt,i) =>
+      `<div class="option" id="opt-${i}" onclick="selectMCQ(${i})">
+        <div class="opt-key">${['A','B','C','D'][i]}</div>
+        <div class="opt-text">${opt}</div>
+        <i class="fa-solid fa-check opt-icon"></i>
+      </div>`
+    ).join('') + `</div>`;
+  } else {
+    optionsHTML = `<input type="text" class="text-answer" id="textAnswer" placeholder="Type your answer…" onkeydown="if(event.key==='Enter') submitText()"/>`;
+  }
+
+  card.innerHTML = `
+    <div class="q-category"><i class="fa-solid fa-tag"></i> ${q.cat}</div>
+    <div class="q-text">${q.q}</div>
+    ${optionsHTML}
+    <div class="explanation" id="explanation"></div>`;
+
+  actions.innerHTML = q.type === 'text'
+    ? `<button class="btn btn--ghost" onclick="submitText()">Submit Answer <i class="fa-solid fa-arrow-right"></i></button>`
+    : `<button class="btn btn--ghost" id="nextBtn" onclick="nextQuestion()" style="display:none">Next <i class="fa-solid fa-arrow-right"></i></button>`;
+
+  if(q.type === 'text') setTimeout(()=>document.getElementById('textAnswer')?.focus(), 100);
+}
+
+function updateTimer(){
+  const el = document.getElementById('timerDisplay');
+  document.getElementById('timerVal').textContent = timeLeft;
+  el.className = 'timer-display' + (timeLeft <= 5 ? ' warning' : '');
+}
+
+function selectMCQ(i){
+  if(document.querySelector('.option.correct,.option.wrong')) return;
+  clearInterval(timerInterval);
+  const q = questions[current];
+  const taken = 20 - timeLeft; timeTaken.push(taken);
+  const correct = i === q.answer;
+  if(correct) score++;
+  userAnswers.push({q:q.q, chosen:q.options[i], correct, correctAns: q.options[q.answer]});
+
+  document.querySelectorAll('.option').forEach((opt,idx)=>{
+    opt.classList.add('disabled');
+    if(idx === q.answer) opt.classList.add('correct');
+    else if(idx === i && !correct) opt.classList.add('wrong');
+    const icon = opt.querySelector('.opt-icon');
+    if(idx === q.answer) icon.className = 'fa-solid fa-check opt-icon';
+    else if(idx === i && !correct) icon.className = 'fa-solid fa-xmark opt-icon';
+  });
+
+  showExplanation(q.explain);
+  document.getElementById('nextBtn').style.display = 'inline-flex';
+}
+
+function submitText(){
+  clearInterval(timerInterval);
+  const input = document.getElementById('textAnswer');
+  const q = questions[current];
+  const val = input.value.trim().toLowerCase();
+  const correct = val === q.answer.toLowerCase() || q.answer.toLowerCase().includes(val) && val.length > 2;
+  const taken = 20 - timeLeft; timeTaken.push(taken);
+  if(correct) score++;
+  userAnswers.push({q:q.q, chosen:input.value||'(no answer)', correct, correctAns:q.answer});
+  input.classList.add(correct?'correct':'wrong');
+  input.disabled = true;
+  showExplanation(q.explain);
+  document.getElementById('quizActions').innerHTML =
+    `<button class="btn btn--ghost" onclick="nextQuestion()">Next <i class="fa-solid fa-arrow-right"></i></button>`;
+}
+
+function autoAdvance(){
+  const q = questions[current];
+  userAnswers.push({q:q.q, chosen:'(timed out)', correct:false, correctAns: q.type==='mcq'?q.options[q.answer]:q.answer});
+  timeTaken.push(20);
+  if(q.type==='mcq'){
+    document.querySelectorAll('.option').forEach((opt,idx)=>{
+      opt.classList.add('disabled');
+      if(idx===q.answer) opt.classList.add('correct');
+    });
+  }
+  showExplanation(q.explain);
+  if(q.type==='text') document.getElementById('quizActions').innerHTML =
+    `<button class="btn btn--ghost" onclick="nextQuestion()">Next <i class="fa-solid fa-arrow-right"></i></button>`;
+  else document.getElementById('nextBtn').style.display='inline-flex';
+}
+
+function showExplanation(html){
+  const el = document.getElementById('explanation');
+  el.innerHTML = '<i class="fa-solid fa-circle-info" style="color:var(--c-mint);margin-right:6px"></i>' + html;
+  el.classList.add('show');
+}
+
+function nextQuestion(){
+  current++;
+  if(current >= questions.length){ showResults(); return; }
+  document.getElementById('questionCard').style.animation = 'none';
+  setTimeout(()=>{
+    document.getElementById('questionCard').style.animation = '';
+    renderQuestion();
+  }, 50);
+}
+
+function showResults(){
+  clearInterval(timerInterval);
+  document.getElementById('quizArea').style.display = 'none';
+  const rs = document.getElementById('resultsScreen');
+  rs.style.display = 'flex';
+  const pct = Math.round(score/questions.length*100);
+  const avgTime = Math.round(timeTaken.reduce((a,b)=>a+b,0)/timeTaken.length);
+  const grade = pct>=90?'Excellent! 🎉':pct>=70?'Great work! 👍':pct>=50?'Good effort! 💪':'Keep studying! 📚';
+
+  let reviewHTML = userAnswers.map((a,i)=>`
+    <div class="review-item ${a.correct?'ok':'bad'}">
+      <i class="fa-solid ${a.correct?'fa-check':'fa-xmark'} ri-icon"></i>
+      <div>
+        <div class="ri-q">Q${i+1}: ${questions[i].q.substring(0,60)}…</div>
+        <div class="ri-ans">Your answer: <strong style="color:${a.correct?'#4ade80':'#f87171'}">${a.chosen}</strong>${!a.correct?` · Correct: <strong style="color:#4ade80">${a.correctAns}</strong>`:''}</div>
+      </div>
+    </div>`).join('');
+
+  rs.innerHTML = `
+    <div class="results-card">
+      <div class="score-ring">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle class="ring-bg" cx="65" cy="65" r="54"/>
+          <circle class="ring-fg" id="ringFg" cx="65" cy="65" r="54"/>
+        </svg>
+        <div class="score-text">
+          <div class="score-pct">${pct}%</div>
+          <div class="score-label">${score}/10</div>
+        </div>
+      </div>
+      <div class="results-title">${grade}</div>
+      <div class="results-sub">You answered ${score} out of ${questions.length} questions correctly.</div>
+      <div class="results-breakdown">
+        <div class="rb correct"><div class="rb-num">${score}</div><div class="rb-label">Correct</div></div>
+        <div class="rb wrong"><div class="rb-num">${questions.length-score}</div><div class="rb-label">Wrong</div></div>
+        <div class="rb time"><div class="rb-num">${avgTime}s</div><div class="rb-label">Avg. time</div></div>
+      </div>
+      <div class="review-list">${reviewHTML}</div>
+      <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn--mint" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Retry Quiz</button>
+        <a href="quiz2.php" class="btn btn--ghost"><i class="fa-solid fa-server"></i> Try Quiz 2 (PHP)</a>
+      </div>
+    </div>`;
+
+  // Animate ring
+  setTimeout(()=>{
+    const circumference = 339.3;
+    document.getElementById('ringFg').style.strokeDashoffset = circumference - (circumference * pct / 100);
+  }, 200);
+}
+
+function openMenu(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('visible');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('visible');document.body.style.overflow='';}
+</script>
+</body>
+</html>
